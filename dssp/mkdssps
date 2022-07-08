@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+##########################################################################
+#
+# GOAL:
+# The script creates DSSP files from PDB files
+#
+# INPUT:
+# 1. a list of PDB file names.
+# or:
+# 2. a file, containing a list of PDB file names
+#
+# OUTPUT:
+# The DSSP files for the given PDB files
+#
+# USAGE:
+# mkdssps <PDB file path> <PDB file path>
+# or
+# mkdssps -f <PDB list file>
+#
+# AUTHOR:
+# Oranit Dror (contact: oranit@post.tau.ac.il)
+#
+##########################################################################
+
+# Find the directory where this perl script is located
+use FindBin;
+
+# Constants
+
+# The location of the dssp application. $FindBin::Bin returns the
+# location from which the script itself was run. Therefore dssp is
+# assumed to be in the same directory as the script. If the name of
+# the DSSP program is different, then change it to the right name. If
+# it is in a different path, then specify the full path.
+$DSSP_PROGRAM = "$FindBin::Bin/dssp";
+
+sub generateDSSP {
+  my $pdbFileName = shift @_;
+  my $dir = shift @_;
+  my $dsspFileName = $pdbFileName;
+  #$dsspFileName =~ s/\.pdb//;
+  $dsspFileName .= ".dssp";
+
+  print "Creating $dir/$dsspFileName from $dir/$pdbFileName\n";
+  system("$DSSP_PROGRAM $dir/$pdbFileName > $dir/$dsspFileName");
+}
+
+sub getDirectory {
+  my $filename = shift @_;
+  if ($filename =~ /(.*)\/([^\/]*)$/) {
+    return $1;
+  }
+  return ".";
+}
+
+sub getBase {
+  my $filename = shift @_;
+  if ($filename =~ /(.*)\/([^\/]*)$/) {
+    return $2;
+  }
+  return $filename;
+}
+
+sub printUsage {
+    print "Create DSSP files from PDB files \n";
+    print "Contact: oranit\@post.tau.ac.il \n";
+    print "Usage: $FindBin::Script -f <PDB list file> \n";
+    print "   or: $FindBin::Script <PDB file> <PDB file> ...\n";
+    print "flags:\n";
+    print "       -f <PDB list file>: a file containing a list of pdb file names \n";
+}
+
+# Check arguments
+if( $#ARGV < 0) {
+    printUsage();
+    exit(0);
+}
+
+if ($ARGV[0] =~ "help") {
+    printUsage();
+    exit(0);
+}
+
+if ($ARGV[0] eq "-f") {
+  print "Reading pdb file names from the given file\n";
+  my $dir = getDirectory($ARGV[1]);
+
+
+  open (IN, $ARGV[1]) or die "Cannot open input file $ARGV[1]";
+  while($line=<IN>) {
+    my @array = split(' ', $line);
+    my $moleculeName = $array[0];
+    generateDSSP($moleculeName,$dir);
+  }
+} else {
+  foreach $file (@ARGV) {
+    generateDSSP(getBase($file),getDirectory($file));
+  }
+}
