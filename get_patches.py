@@ -98,7 +98,7 @@ def preprosses_patches_batched(distogram_file,centers=6, patch_size=30,batch_siz
 if __name__ == '__main__':
     try:
         distogram_filenames_file = sys.argv[1]
-        preprosses_patches_batched(distogram_filenames_file,size_r=250,size_l=700,batch_size=2500,centers=8,patch_size=20)
+        preprosses_patches_batched(distogram_filenames_file,size_r=750,size_l=250,batch_size=2500,centers=8,patch_size=20)
     except Exception as e :
         print(e)
         with open("errors.txt",'a')as f:

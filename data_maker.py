@@ -20,7 +20,7 @@ def verify_dir(path):
 
 def pdb_to_dssp(exe_dir, pdb_file):
     verify_dir("dssp")
-    dssp_name = "dssp/" + pdb_file.split(".pdb")[0]
+    dssp_name = "dssp/" + pdb_file.split(".pdb")[0] + ".dssp"
     cmd = exe_dir + "/dssp/mkdssps " + pdb_file
     os.system(cmd)
     dssp_out = pdb_file + ".dssp";
