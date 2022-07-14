@@ -3,7 +3,7 @@ from  model_evaluate import hit_rate,load_modle
 import argparse
 
 
-model_path="/cs/labs/dina/matanhalfon/CAPRI/NNscripts/lr-0.003_5_train_transformer_ABDBADAMW_Alphfold_transformer_1_3_heads_3_6_72_102_1e3_lr_wd_5e-3_sample3_split_1_dockQ_smallers/mymodel_116"
+model_path="weights/mymodel_116"
 
 
 
