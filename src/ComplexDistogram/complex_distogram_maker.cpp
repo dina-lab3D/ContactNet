@@ -123,6 +123,7 @@ int main(int argc, char **argv) {
 
     // calculate matrices
     std::ofstream filenames("distograms.txt");
+    std::ofstream transfile("trans.txt");
     for(unsigned int i=0; i<trans.size(); i++) {
       Molecule<Atom> tmol2 = mol2;
       tmol2.rigidTrans(trans[i]);
@@ -133,6 +134,7 @@ int main(int argc, char **argv) {
       std::cout << i+1 << " " << trans[i] << " ";
       saveMat(mol1.size(), tmol2.size(), mat, out_file);
       filenames << out_file << std::endl;
+      transfile << i+1 << "\t" << trans[i] << std::endl;
     }
   }
   return 1;
