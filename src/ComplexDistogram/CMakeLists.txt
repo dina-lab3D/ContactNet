@@ -3,13 +3,8 @@ project(InterfaceFeatures)
 include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 17)
 
-#FIND_PACKAGE(Boost COMPONENTS program_options REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS} )
 
-set(GAMB_LIB /cs/labs/dina/dina/libs/gamb++)
-
-include_directories(${GAMB_LIB} ${Boost_INCLUDE_DIRS} )
-link_directories(${GAMB_LIB})
-
-set(SOURCE_FILES cnpy.cpp complex_distogram_maker.cpp)
+set(SOURCE_FILES Atom.cc  Matrix3.cc  PDB.cc  RigidTrans3.cc  Rotation3.cc cnpy.cpp complex_distogram_maker.cpp)
 add_executable(complex_distogram_maker ${SOURCE_FILES})
-target_link_libraries(complex_distogram_maker ${Boost_LIBRARIES} gamb++ z stdc++fs)
+target_link_libraries(complex_distogram_maker ${Boost_LIBRARIES} z stdc++fs)
