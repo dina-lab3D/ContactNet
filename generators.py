@@ -6,7 +6,6 @@ import numpy as np
 import time
 import pdb
 import gc
-from config import config4 as config
 
 seqDir = "dssp"
 
@@ -16,25 +15,6 @@ def to_one_hot(x):
     discretisize=tf.keras.layers.experimental.preprocessing.Discretization(bins)(x)
     return   tf.keras.utils.to_categorical(discretisize, num_classes=len(bins))
 
-
-def build_prot_dict(prot1, prot2, size_r, size_l):
-    dict = {}
-    self1 = np.load("self-distograms/" + prot1.split(".pdb")[0] + ".npy")
-    self2 = np.load("self-distograms/" + prot2.split(".pdb")[0] + ".npy")
-    self1 = preprosser.padTo(self1, (size_r, size_r))
-    self2 = preprosser.padTo(self2, (size_l, size_l))
-    dssp_file1 = "dssp/" + prot1.split(".pdb")[0] + ".dssp"
-    dssp_file2 = "dssp/" + prot2.split(".pdb")[0] + ".dssp"
-    dssp1 = preprosser.getOneHotMatrix(prot1, size_r)
-    dssp2 = preprosser.getOneHotMatrix(prot2, size_l)
-    dssp_1 = preprosser.padTo(dssp1,(size_r, 25))
-    dssp_2 = preprosser.padTo(dssp2,(size_l, 25))
-    dict[prot1[:6]]=(dssp1, self1)
-    dict["Ag"] = (dssp2, self2)
-    print(prot1)
-    print(prot2)
-    print(dict)
-    return dict
 
 
 def get_new_batch(data_dir, line_number, batch_size=2500, mini_file_size=10000,single_batched =False):
@@ -70,13 +50,11 @@ def draw_from_batch(line_number, geo_batch, cords_batch, batch_size=2500, mini_f
 
 def single_file_genarator_pre_batched(prot_ag,prot_ab, size_r=1000, size_l=1000,
                                       patch_size=20, data_dir="",files_in_batch=2500,
-                                      single_batched=False):
+                                      single_batched=False,trans_num=0):
     cur_batch_number = 0
     cur_batch_folder = 0
     geo_batch, cords_batch = get_new_batch(data_dir, 0,single_batched=single_batched)
-    while True:
-        if not line:
-            raise EOFError
+    for line_number in range(trans_num):
         try:
             new_batch_folder, new_batch_number = get_cur_batch_index(line_number,batch_size=files_in_batch)
             if new_batch_number != cur_batch_number or cur_batch_folder != new_batch_folder:
@@ -87,7 +65,7 @@ def single_file_genarator_pre_batched(prot_ag,prot_ab, size_r=1000, size_l=1000,
             seq1, self_1 = preprosser.padTo(preprosser.getOneHotMatrix("dssp/" + prot_ag.split(".pdb")[0] + ".dssp", size_r),
                                             (size_r, 25)),preprosser.padTo(np.load("self-distograms/" + prot_ag.split(".pdb")[0] + ".npy"),(size_r,size_r))
             seq2, self_2 = preprosser.padTo(preprosser.getOneHotMatrix("dssp/" + prot_ab.split(".pdb")[0] + ".dssp", size_l),
-                                            (size_, 25)),preprosser.padTo(np.load("self-distograms/" + prot_ab.split(".pdb")[0] + ".npy"),(size_l,size_l))
+                                            (size_l, 25)),preprosser.padTo(np.load("self-distograms/" + prot_ab.split(".pdb")[0] + ".npy"),(size_l,size_l))
         except OverflowError:
             print("overflow  at ",name)
             continue
@@ -103,14 +81,14 @@ def single_file_genarator_pre_batched(prot_ag,prot_ab, size_r=1000, size_l=1000,
 
 
 def file_genarator_pre_batched(prot_ag,prot_ab, batch_size=10, size_r=1000, size_l=1000,
-                      patch_size=20, data_dir="",file_in_batch=2500,single_batched=False):
-    line_gen = single_file_genarator_pre_batched(prot_ag,prot_ab, size_r=size_r,
+                      patch_size=20, data_dir="",file_in_batch=2500,single_batched=False,trans_num=0):
+    line_gen = single_file_genarator_pre_batched(prot_ag,prot_ab, size_r=size_r,trans_num=trans_num,
                                                 size_l=size_l,patch_size=patch_size,data_dir=data_dir,files_in_batch=file_in_batch,
                                                 single_batched=single_batched)
     cur_batch_folder = 0
     line_number = 0
     i=0
-    while True:
+    for line_number in range(trans_num):
         seqs1 = []
         distograms1 = []
         seqs2 = []
@@ -126,7 +104,6 @@ def file_genarator_pre_batched(prot_ag,prot_ab, batch_size=10, size_r=1000, size
                 distograms2.append(self_2)
                 patches_batch.append(patches)
                 geoMats.append(geo_patches)
-                line_number += 1
 
         except EOFError:
             print("trans file finished at file_genarator_pre_batched")

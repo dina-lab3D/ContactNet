@@ -5,31 +5,17 @@ import numpy as np
 from termcolor import colored
 import random as rd
 from preprocessing import preprosser
-from generators import gen_cycler, build_prot_dict
 from Bio import SeqIO, pairwise2
 from Bio.PDB import Polypeptide, is_aa, PDBParser
 import pathlib
 import re
-# import mlflow
 import seaborn as sns
 import glob
 import shutil
 import matplotlib.pyplot as plt
-# import tensorflow as tf
-# from tensorflow.keras.layers import Multiply,Reshape,Dense,Softmax
-# from tensorflow.keras import  Model ,Input,layers
 import seaborn as sns
-# from dock_layers import chem_transformer1D,smallMLP,build_patch_model2
 import csv
 import subprocess
-
-###commands lines ###
-# chimeraX color blue (patchNet)
-#color name patchnet rgba(12%, 46%, 70%, 1)
-# chimeraX color orange (Soap)
-# color name soap rgba(100%, 55%, 11%, 1)
-# chimeraX color green (AlphaFold)
-# color name alphafold rgba(19%, 70%, 19%, 1)
 
 get_frag_chain = "~dina/utils/get_frag_chain.Linux"
 get_name_chain = "/cs/staff/dina/scripts/namechain.pl"
@@ -56,56 +42,6 @@ LIGHT_SEQ = "DIELTQSPDSLAVSLGQRATISCRASESVDSYGNSFMQWYQQKPGQPPKLLIYRASNLESGIPARFS
 
 UNIQE_AA = {"UNK": "X", "TYS": "Y", "FME": "M", "PCA": "Q", "CSD": "C", "MLY": "K", "SEP": "S", "YCM": "C", "CSX": "C",
             "NEP": "H", "IAS": "D"}
-
-###DB5###
-# structDir = "/vol/sci/bio/bio3d/matanhalfon/DockingResults_fine_unbound"
-# dockingFIle = "patchdock_output.txt"
-# transDir = "DB5_trans_dir"
-
-# seqDir= "/cs/labs/dina/matanhalfon/CAPRI/seqs"
-
-##dockground###
-# structDir="/cs/labs/dina/matanhalfon/CAPRI/dockground/PDB"
-
-##ABDB##
-# structDir="/cs/labs/dina/matanhalfon/CAPRI/ABDB/splited_pdb"
-# structDir="/cs/labs/dina/matanhalfon/CAPRI/ABDB/nanoAb"
-structDir = "/cs/labs/dina/matanhalfon/CAPRI/ABDB/AlphaFold_docking"
-structDir_spec = "/cs/labs/dina/matanhalfon/CAPRI/ABDB/specifisity_test"
-# structDir="/cs/labs/dina/matanhalfon/CAPRI/saxs"
-
-# structDir="splited_pdb"
-dockingFile = "docking_fine.res"
-dockingFile_spec = "docking_spec.res"
-rmsd_file = "rmsd.res"
-# dockingFile="dockingFine.res"
-# soapFile="soap_score_bound.res"
-# soapFile="soap_score_bound.res"
-# soapFile = "soap_score_fine.res"
-soapFile = "soap_score_fine.res"
-soapFile_spec = "soap_score_spec.res"
-# transDir="dockground_fine_trans_dir_bound"
-# transDir="ABDB_nano_ab"
-
-# transDir="dockground_trans_dir_fine_train"
-transDir = "AlphaFold_trans_dir_dockq"
-# transDir = "saxs_trans_dir"
-# transDir = "db5_trans_dir"
-transDir_test = "AlphaFold_trans_dir_test"
-
-spec_dir = "specifisity_trans_dir"
-
-# transDir="ABDB_trans_dir_fine_bound"
-# transDir="ABDB_trans_dir_fine_nano_train"
-# transDir_test="ABDB_trans_dir_fine_nano_test"
-
-seqDir = "/cs/labs/dina/matanhalfon/CAPRI/dockground/dssp"
-
-
-##antigen-antibody
-# structDir="/vol/sci/bio/bio3d/dina/Benchmarks/benchmark5/structures"
-# transDir="AA_trans"
-
 
 def get_seq(sourceDir, out_dir="seqs"):
     i = 0
@@ -1634,111 +1570,3 @@ def aggreate_results_from_models(suffix,pdbs_test, evaluation_dir, struct_dir, o
     aggreagate_evaluations(pdbs_test,evaluation_dir,struct_dir,out_dir,eval_file="evaluation_"+suffix+"_")
     cluster_eval(out_dir, pdbs_test, "evaluation_"+suffix+"_")
     insert_dockQ_column(net_suffix="evaluation_"+suffix+"_")
-
-#
-# spec_data = {'5WI9_1', '3R1G_1', '5CWS_1', '6JMQ_1', '2ARJ_1', '5VEB_1', '4K24_1', '3BSZ_1', '6MLK_1', '4QWW_1',
-#              '5ZS0_1', '6AL5_1', '4ZFO_1', '6CNJ_1', '3HB3_1', '3J1S_1', '3LH2_1', '4XTR_1', '6CMG_1', '5W5Z_1',
-#              '5E8E_1', '4YPG_1', '4F3F_1', '5VOB_1', '4QHU_1', '5BV7_1'}
-
-if __name__ == '__main__':
-    print("start")
-    suffixs=["evaluation_tr_1_","soap_results_"]
-    workdir="/cs/labs/dina/matanhalfon/CAPRI/ABDB/AlphaFold_all_results"
-    # test_pdbs = get_pdb_from_file(osp.join("bench5AA", "test_pdbs"),line_len=6)
-    test_pdbs={"1IQD","2W9E","1KXQ"}
-    # test_pdbs = get_pdb_from_file(osp.join("ABDB/AlphaFold_data_dir/AlphaFold_data", "test_pdbs"),line_len=6)
-
-    # get_variable_Ab_variable("bench5AA/db5_docking","prots","_r_u.pdb","_Ab.pdb")
-    # fix_suffix("nano_train/NR_H_Protein_Chothia","antigen.pdb")
-    # split_modeled("bench5AA/AlphaFold_docking", "bench5AA/AlphaFold_docking",test_pdbs,suffix_l="_l_u.pdb")
-    # fold_complexes("bench5AA/db5_docking","bench5AA/AlphaFold_docking",test_pdbs)
-
-    # create_interface_files(workdir, suffixs[1])
-# workdir="/cs/labs/dina/matanhalfon/CAPRI/ABDB/AlphaFold_splited_modeled"
-#     test_pdbs = get_pdb_from_file(osp.join("ABDB/AlphaFold_data_dir/AlphaFold_data", "test_pdbs"),line_len=6)
-    # for  suffix in suffixs:
-    # get_interface_results_alphaFold(workdir,test_pdbs)
-    # get_ensambel("ABDB/AlphaFold_all_results", "ABDB/AlphaFold_data_dir/AlphaFold_data","ensambel_Soap_", ["_tr_1_"],use_Soap=True)
-    # get_variable_Ab_variable("saxs","saxs_prot","_Fab.pdb","_sFab.pdb")
-    # workdir="bench5AA/db5_docking"
-    # aggreagate_evaluations(osp.join("bench5AA", "test_pdbs"),
-    #                        osp.join("bench5AA/patch_data_db5"), osp.join("ABDB/AlphaFold_docking"),
-    #                        osp.join("bench5AA/eval_dbs"), eval_file="evaluation_hm_")
-
-    #
-    #             seen.add(prot)
-    # get_AlphaFold_results("bench5AA/AlphaFold_docking","bench5AA/AlphaFold_docking",workdir="bench5AA",suffix_l="_l_u.pdb")
-    # get_interface_results_alphaFold("bench5AA/AlphaFold_docking", test_pdbs,folding_foldr="bench5AA/AlphaFold_docking",line_len=4,suffix_l="_l_u.pdb")
-    # set_data("nano_train", "NR_H_Protein_Chothia", "trans_dir", docking_file="docking_nano.res", soap_file="soap_score_nano.res", prot_suffix="_nanonet_full_relaxed_tr.pdb"
-    #          , suffix_l="_Ag.pdb", suffix_r="_nanonet_full_relaxed_tr.pdb")
-    # prepare_data("nano_train",workdir="nano_train", trans_dir="trans_dir",add_pos_to_train=200, test_size=0,line_end=6,suffix_l="_Ag", suffix_r="_nanonet_full_relaxed_tr")
-    create_pdb_dir("nano_train/NR_H_Protein_Chothia", "nano_train/pdbs", "_Ag.pdb", "_nanonet_full_relaxed_tr.pdb")
-    # get_consencse("ABDB/meraged","AlphaFold_data_dir/AlphaFold_data/test_pdbs","ABDB",model_suffix="_tr_2_",save_dir="ABDB/Consensus")
-    # merage_AlphaFold_patchDock_results("ABDB/AlphaFold_docking_patch_data/midfiles", "ABDB/AlphaFold_all_results","ABDB/Consensus/meraged",
-    #                                    "ABDB/AlphaFold_data_dir/AlphaFold_data/test_pdbs","_tr_last_", "_tr_2_", 5)
-    # build_rmsd_Alphafold_table("ABDB/meraged")
-    # write_specifisity_dir("bench5AA/db5_docking", "bench5AA/specifisity_test")
-    # workdir="ABDB"
-    # trans_dir="AlphaFold_trans_dir_test_2"
-    # workdir = "nano_train"
-    # trans_dir="trans_dir"
-    # create_test_dir("ABDB/AlphaFold_trans_dir_dockq",osp.join(workdir,"AlphaFold_trans_dir_test_2"))
-    # merage_df(osp.join(workdir,trans_dir),osp.join(workdir,"train_all_trans_split_1"),"nano_train/all_pdbs")
-    # os.system("python3 geo_scripter.py "+"Alphafold_distograms"+" "+osp.join(workdir,"test_all_trans_split_1"+"_part_1")+" 14 0" )
-    # create_test_dir("ABDB/AlphaFold_trans_dir_dockq","ABDB/AlphaFold_trans_dir_test")
-    # with open(osp.join("ABDB","train_pdbs")) as prot_train:
-    #     pdbs_train = {prot.strip() for prot in prot_train}
-    # with open(osp.join("ABDB","test_pdbs")) as prot_test:
-    #     pdbs_test= {prot.strip() for prot in prot_test}
-    # train_with_no_identity =remove_seq_identity(pdbs_test,pdbs_train,"ABDB/seqs",th=0.94)
-    # with open("ABDB" + "/train_pdbs_0.94", 'w') as train_f:
-    #     for line in train_with_no_identity:
-    #         train_f.write(line + "\n")
-    # pdbs="/cs/labs/dina/matanhalfon/CAPRI/ABDB/pdbs"
-
-    # workdir="bench5AA/db5_docking"
-    # for dir in os.listdir(workdir):
-    #     if osp.isdir(osp.join(workdir,dir)):
-    #         write_dssp(osp.join(workdir,dir),osp.join("bench5AA","dssp"))
-    # get_seq(osp.join("ABDB","splited_pdb"),osp.join("ABDB","seqs"))
-    # get_chain_from_fasta(pdbs,"/cs/labs/dina/matanhalfon/CAPRI/ABDB/H_chains")
-    # for tr_file in os.listdir(osp.join("ABDB",transDir)):
-    #     try:
-    #         df=pd.read_csv(osp.join("ABDB",transDir,tr_file),sep="\t",index_col=0).head(3500)
-    #         df.to_csv(osp.join("ABDB",transDir_test,tr_file), sep="\t", quoting=csv.QUOTE_NONE, quotechar="",
-    #                        escapechar="\\")
-    #     except :
-    #         print(tr_file)
-    # workdir="ABDB"
-    # transDir_cur=osp.join(workdir,transDir_test)
-    # pos, neg = merage_by_label(transDir_cur, osp.join(workdir, "all_pdbs"))
-    # all = pd.concat([pos, neg])
-    # all.to_csv(osp.join(workdir, "all_trans_soap" ), sep="\t", header=None, quoting=csv.QUOTE_NONE,
-    #            quotechar="", escapechar="\\")
-    # workdir="ABDB"
-
-    # preduce_tran_dir(workdir=workdir,struct_dir=structDir_spec, trans_dir=spec_dir, docking_file=dockingFile_spec,soap_file=soapFile_spec,take_top=500)
-    # create_test_dir(osp.join(workdir,spec_dir),osp.join(workdir,spec_dir))
-    # preduce_tran_dir(workdir="saxs", suffix_l="_Ag.pdb", suffix_r="_sFab.pdb")
-    # create_test_dir("saxs/saxs_trans_dir","saxs/saxs_trans_dir_test")
-    # create_test_dir(osp.join(workdir,),"saxs/saxs_trans_dir_test")
-    # merage_df(osp.join(workdir,"saxs_trans_dir"),osp.join(workdir,"saxs_all_trans"),"ABDB/AlphaFold_data_dir/AlphaFold_data/test_pdbs")
-    # merage_df(osp.join(workdir,spec_dir),osp.join(workdir,"specifisity_trans_test"),"ABDB/AlphaFold_data_dir/AlphaFold_data/test_pdbs")
-    # prepare_data("ABDB/AlphaFold_data_dir/no_db_5","ABDB", add_pos_to_train=0, test_size=70, line_end=6, suffix_r="_Ab", suffix_l="_Ag")
-    # delete_sub_folders("/cs/labs/dina/matanhalfon/structs/Alphafold_AB/structs")
-    # preduce_tran_dir(workdir="bench5AA", suffix_l="_l_u.pdb", suffix_r="_r_u.pdb")
-    # create_Alphafold_dock_dirs(osp.join("ABDB","AlphaFold_splited_modeled"),osp.join("ABDB","AlphaFold_splited_modeled"),"/cs/labs/dina/tomer.cohen13/matan/folded_AlphaFold",test_pdbs)
-    #
-    # with open("ABDB/AlphaFold_test_prots",'w+') as f:
-    #     for p in test_prots:
-            # f.write(p+"\n")
-    # files=[]tra
-    # for  prot in unfolded:
-    #     files+=glob.glob(osp.join("ABDB","AlphaFold_docking",prot+"*"))
-    # for dir in files:
-    #     try:
-    #         shutil.rmtree(dir)
-    #     except FileNotFoundError:
-    #         print("error deleting ",dir)
-    #         continue
-    #

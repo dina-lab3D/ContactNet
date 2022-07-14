@@ -17,8 +17,6 @@ tf.config.run_functions_eagerly(False)
 import sys
 import random as rd
 import datetime
-from decay_class import CustomSchedule,WarmUp,LRLogger
-from generators import gen_cycler,build_prot_dict
 import os.path as osp
 import os
 from dock_layers import ResBlock2D,ResBlock2Dv2, chem_transformer1D, small_transformer,Block_conv_block,multiHeader,\
@@ -26,7 +24,6 @@ from dock_layers import ResBlock2D,ResBlock2Dv2, chem_transformer1D, small_trans
 from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint
 import matplotlib.pyplot as plt
 import seaborn as sn
-from config import config4 as config
 import os
 
 

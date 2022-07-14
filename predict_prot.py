@@ -1,6 +1,5 @@
 import os.path as osp
 from  model_evaluate import hit_rate,load_modle
-from generators import build_prot_dict
 import argparse
 
 
@@ -36,7 +35,7 @@ config=dict(
     hyper=dict(
         dist_alpha=-0.1,
         sample_rate=4,
-        batch_size=20,
+        batch_size=1,
         num_of_epochs=12,
         steps_per_epoch=1000,
         lr=3 * (1e-3),
@@ -61,6 +60,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="parser for data preparation for single protein")
     parser.add_argument('antigen_pdb',type=str,help="Antigen PDB file name")
     parser.add_argument('antibody_pdb',type=str,help="Antibody PDB file name")
+    parser.add_argument('--trans_num',type=int,default=0,help="# of transform to read from a transformation file, default all")
+
     args=parser.parse_args()
     model = load_modle(model_path, config)
-    hit_rate(model, args.prot_dir,args.antigen_pdb,args.antibody_pdb, config, data_dir="PPI")
+    hit_rate(model, args.antigen_pdb,args.antibody_pdb, config, trans_num=args.trans_num,data_dir="PPI")

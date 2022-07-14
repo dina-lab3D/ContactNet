@@ -18,11 +18,10 @@ import math
 import  matplotlib
 
 from PatchNet import build_patch_model2
-from generators import complex_genarator,build_prot_dict,gen_cycler,file_genarator_pre_batched
+from generators import file_genarator_pre_batched
 from preprocessing import preprosser
 import bisect
 import matplotlib.pyplot as plt
-from helper import get_pdb_from_file
 import gc
 import  pandas as pd
 import csv
@@ -38,7 +37,7 @@ def culc_hitrate(table,k):
     return np.sum(top_k[:,0].astype(float))/k
 
 
-def hit_rate(model, workdir,prot_ag,prot_ab,config,data_dir=""):
+def hit_rate(model,prot_ag,prot_ab,config,data_dir="",trans_num=0):
     """
     :param model:  NN model
     :param workdir: dir where trans_file is located
@@ -50,14 +49,15 @@ def hit_rate(model, workdir,prot_ag,prot_ab,config,data_dir=""):
     :return:
     """
     i=0
-    gen = file_genarator_pre_batched(prot_ag,prot_ab,  data_postfix="", prot_dict=prot_dict, batch_size=config["hyper"]["batch_size"],
+    gen = file_genarator_pre_batched(prot_ag,prot_ab, batch_size=config["hyper"]["batch_size"],
                             patch_size=config["arch"]["patch_size"], size_r=config["arch"]["size_r"], size_l=config["arch"]["size_l"],
-                            data_dir=data_dir, title_len=config["line_len_R"],single_batched=True)
+                            data_dir=data_dir,single_batched=True,trans_num=trans_num)
 
     score_by_label=None
     try:
         for b in gen:
-            scores=model.predict(b)
+            scores=model.predict(b)["classification"]
+            print(scores)
             if score_by_label is None:
                 score_by_label=scores
             else:
@@ -68,22 +68,12 @@ def hit_rate(model, workdir,prot_ag,prot_ab,config,data_dir=""):
     except EOFError:
         print("finished with "+trans_file )
     gc.collect()
-    trans=pd.read_csv("trans",sep="|").to_numpy().reshape((-1,1))[:len(score_by_label)]
+    trans=pd.read_csv(osp.join("PPI","trans.txt"),sep="\t",index_col=0).to_numpy().reshape((-1,1))[:len(score_by_label)]
     score_by_label = np.concatenate([score_by_label, trans],axis=1)
     df=pd.DataFrame(score_by_label,columns=["score","trans"])
-    df.to_csv(osp.join(workdir,"evaluation_"+trans_file), sep="\t", quoting=csv.QUOTE_NONE,
+    df.to_csv("evaluation", sep="\t", quoting=csv.QUOTE_NONE,
                quotechar="", escapechar="\\")
-    if np.any((score_by_label[:,2].astype(float)<10 )|(score_by_label[:,3].astype(float)<5)):
-            try:
-                first_near_native=np.where((score_by_label[:,2].astype(float)<=10 )|(score_by_label[:,3].astype(float)<=4))[0][0]
-            except IndexError:
-                first_near_native=3500
-            print("first hit at ",first_near_native)
-            return first_near_native
-    else:
-        print("all trans are neg ")
-        if ratio: return 0
-        else: return 3500
+
 
 def get_hit_rates_batched(model_path,test_pdb,test_dir,config):
     test_prot_dict = build_prot_dict(test_pdb,config["arch"]["size_r"],config["arch"]["size_l"],
