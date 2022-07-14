@@ -62,10 +62,10 @@ def single_file_genarator_pre_batched(prot_ag,prot_ab, size_r=1000, size_l=1000,
             cur_batch_folder, cur_batch_number = new_batch_folder, new_batch_number
             geo_patches, patches = draw_from_batch(line_number, geo_batch, cords_batch,batch_size=files_in_batch)
 
-            seq1, self_1 = preprosser.padTo(preprosser.getOneHotMatrix("dssp/" + prot_ag.split(".pdb")[0] + ".dssp", size_r),
-                                            (size_r, 25)),preprosser.padTo(np.load("self-distograms/" + prot_ag.split(".pdb")[0] + ".npy"),(size_r,size_r))
-            seq2, self_2 = preprosser.padTo(preprosser.getOneHotMatrix("dssp/" + prot_ab.split(".pdb")[0] + ".dssp", size_l),
-                                            (size_l, 25)),preprosser.padTo(np.load("self-distograms/" + prot_ab.split(".pdb")[0] + ".npy"),(size_l,size_l))
+            seq1, self_1 = preprosser.padTo(preprosser.getOneHotMatrix(  prot_ag.split(".pdb")[0] + ".dssp", size_r),
+                                            (size_r, 25)),preprosser.padTo(np.load(prot_ag.split(".pdb")[0] + "_self_distogram.npy"),(size_r,size_r))
+            seq2, self_2 = preprosser.padTo(preprosser.getOneHotMatrix( prot_ab.split(".pdb")[0] + ".dssp", size_l),
+                                            (size_l, 25)),preprosser.padTo(np.load(prot_ab.split(".pdb")[0] + "_self_distogram.npy"),(size_l,size_l))
         except OverflowError:
             print("overflow  at ",name)
             continue
