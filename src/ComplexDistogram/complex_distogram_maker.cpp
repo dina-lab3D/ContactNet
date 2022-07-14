@@ -1,13 +1,14 @@
-#include <fstream>
-#include <RigidTrans3.h>
-#include <iostream>
-#include <Molecule.h>
-#include <Atom.h>
+#include "RigidTrans3.h"
+#include "Molecule.h"
+#include "Atom.h"
 #include "cnpy.h"
 
 #include <boost/algorithm/string.hpp>
 #include <filesystem>
 namespace fs = std::filesystem;
+
+#include <fstream>
+#include <iostream>
 
 void saveMat(unsigned long n, unsigned long m, std::vector<float> mat, std::string file_name) {
   std::cout << "saving distogram: " << file_name<<std::endl;
