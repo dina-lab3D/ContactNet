@@ -11,7 +11,6 @@ config=dict(
     data_file="train",
     line_len_R=6,
     line_len_L=2,
-    patch_dir="/cs/labs/dina/matanhalfon/patch_data/nano_train",
     arch=dict(
         number_of_patches=8,  # 6
         seq_latent_dim=72,  # 65
@@ -45,23 +44,12 @@ config=dict(
     ),
 )
 
-# def edit_config(args):
-#     config["workdir"]=args.prot_dir
-#     config["suffix_r"]=args.suffix_Ab
-#     config["suffix_l"] = args.suffix_Ag
-#     config["self_distogram_dir"]=osp.join(args.prot_dir, "self-distograms")
-#     config["patch_dir"]= osp.join(args.prot_dir, "patch_data","trans"+args.suffix_Ab)
-#     config["trans_dir"]=args.prot_dir
-#     with open(osp.join(args.prot_dir, "prots"), 'w') as s:
-#         s.write(args.prot_name)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="parser for data preparation for single protein")
     parser.add_argument('antigen_pdb',type=str,help="Antigen PDB file name")
     parser.add_argument('antibody_pdb',type=str,help="Antibody PDB file name")
     parser.add_argument('--trans_num',type=int,default=0,help="# of transform to read from a transformation file, default all")
-
     args=parser.parse_args()
     model = load_modle(model_path, config)
     hit_rate(model, args.antigen_pdb,args.antibody_pdb, config, trans_num=args.trans_num,data_dir="PPI")

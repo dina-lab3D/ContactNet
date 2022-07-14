@@ -189,5 +189,3 @@ def build_patch_model2(number_of_patches,config,training=True,training_dockQ_hea
     predicted_lig_rmsd=Dense(1,activation='relu',name="lig_rmsd",trainable=training)(x)
     return Model(inputs=[seq1,geo_seq1, seq2,geo_seq2, geo,patches],
                  outputs={"classification":out,"lig_rmsd":predicted_lig_rmsd,"dockQ":predicted_dockQ})
-
-
