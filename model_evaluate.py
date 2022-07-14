@@ -6,7 +6,6 @@ from tensorflow.keras import layers, Model ,Input
 from tensorflow.keras.layers import Dense, Conv1D, Conv2D, AveragePooling1D, AveragePooling2D, Add, Activation, \
     MaxPool2D, BatchNormalization, Permute, Multiply, Reshape ,Dropout
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-import preprocessing
 import matplotlib.pyplot as plt
 import sys
 import random as rd
@@ -19,7 +18,6 @@ import  matplotlib
 
 from PatchNet import build_patch_model2
 from generators import file_genarator_pre_batched
-from preprocessing import preprosser
 import bisect
 import matplotlib.pyplot as plt
 import gc
