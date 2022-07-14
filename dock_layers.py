@@ -6,20 +6,16 @@ from tensorflow.keras import layers, Model, Input
 from tensorflow.keras.layers import Dense, Conv1D, Conv2D, AveragePooling1D, AveragePooling2D, Add, Activation, \
     MaxPool2D, BatchNormalization, Permute, Multiply, Reshape, Dropout, Attention, GlobalAvgPool2D, GlobalMaxPool2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-import preprocessing
 import matplotlib.pyplot as plt
 import sys
 import random as rd
 import datetime
 import os.path as osp
 import os
-# import mlflow.keras
-from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint
 import matplotlib.pyplot as plt
 import seaborn as sn
 
 
-# from config import config2  as config
 
 class CloseDist_loss(tf.keras.losses.Loss):
     def __init__(self, alpha=-0.1):

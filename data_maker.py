@@ -19,7 +19,6 @@ def verify_dir(path):
         os.mkdir(path)
 
 def pdb_to_dssp(exe_dir, pdb_file):
-    verify_dir("dssp")
     dssp_name = "dssp/" + pdb_file.split(".pdb")[0] + ".dssp"
     cmd = exe_dir + "/dssp/mkdssps " + pdb_file
     os.system(cmd)
@@ -27,17 +26,12 @@ def pdb_to_dssp(exe_dir, pdb_file):
     os.rename(dssp_out, dssp_name)
 
 def pdb_to_self_distogram(exe_dir, pdb_file):
-    verify_dir("self-distograms")
     cmd = exe_dir + "/src/SelfDistogram/self_distogram_maker " + pdb_file
     os.system(cmd)
-    out_file_name = pdb_file.split(".pdb")[0] + ".npy"
-    new_file_name = "self-distograms/" + out_file_name
+    out_file_name = pdb_file.split(".pdb")[0] + "_self_distogram.npy"
+    new_file_name =  pdb_file.split(".pdb")[0] + "_self_distogram.npy"
     os.rename(out_file_name, new_file_name)
 
-# def write_evaluate_script(args):
-#     script_final=script_intro+" "+osp.join(args.prot_dir,"prots")+ osp.join(args.prot_dir, "patch_data")
-#     with open(osp.join(args.prot_dir, "script"), 'w') as s:
-#         s.write(script_final)
 
 def create_predata(exe_dir, antigen_pdb, antibody_pdb):
     pdb_to_dssp(exe_dir, antigen_pdb)
