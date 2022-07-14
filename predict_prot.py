@@ -1,9 +1,10 @@
 import os.path as osp
 from  model_evaluate import hit_rate,load_modle
 import argparse
+import sys 
 
-
-model_path="weights/mymodel_116"
+exe_dir = osp.dirname(osp.realpath(sys.argv[0]))
+model_path=osp.join(exe_dir,"weights/mymodel_116")
 
 
 
