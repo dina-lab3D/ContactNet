@@ -38,7 +38,18 @@ void readTransFile(std::string filename, std::vector<RigidTrans3>& trans, unsign
     boost::split(split_results, line, boost::is_any_of(" :|\t"),
                  boost::token_compress_on);
     //std::cerr << split_results.size() << std::endl;
-    if (split_results.size() < 6) continue;
+    if (split_results.size() < 7) continue;
+
+    int transNumber = 0;
+    try {
+      transNumber = std::stoi(split_results[0]);
+    }
+    catch (...) {
+      continue;
+      //      cout << "Invalid input. Please try again!\n";
+    }
+
+
     // read the last 6 numbers from any file format
     unsigned int trans_index = split_results.size() - 6;
     RigidTrans3 tr(Vector3(std::stof(split_results[trans_index].c_str()),
