@@ -5,6 +5,8 @@ import sys
 
 exe_dir = osp.dirname(osp.realpath(sys.argv[0]))
 model_path=osp.join(exe_dir,"weights/mymodel_116")
+model_path_nano=osp.join(exe_dir,"weights/mymodel_9")
+
 
 
 
@@ -51,6 +53,10 @@ if __name__ == '__main__':
     parser.add_argument('antigen_pdb',type=str,help="Antigen PDB file name")
     parser.add_argument('antibody_pdb',type=str,help="Antibody PDB file name")
     parser.add_argument('--trans_num',type=int,default=0,help="# of transform to read from a transformation file, default all")
+    parser.add_argument('--nanobody', type=int, default=0, help="enter 1 if nanobody to use fine-tuned weights else 0")
     args=parser.parse_args()
-    model = load_modle(model_path, config)
+    if args.nanobody:
+        model = load_modle(model_path_nano, config)
+    else:
+        model = load_modle(model_path, config)
     hit_rate(model, args.antigen_pdb,args.antibody_pdb, config, trans_num=args.trans_num,data_dir="PPI")
