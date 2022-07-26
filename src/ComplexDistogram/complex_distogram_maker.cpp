@@ -10,7 +10,13 @@ namespace fs = std::filesystem;
 #include <fstream>
 #include <iostream>
 
-void saveMat(unsigned long n, unsigned long m, std::vector<float> mat, std::string file_name) {
+std::string trimExtension(const std::string file_name) {
+  if(file_name[file_name.size()-4] == '.')
+    return file_name.substr(0, file_name.size() - 4);
+  return file_name;
+}
+
+void saveMat(unsigned long n, unsigned long m, std::vector<float>& mat, std::string file_name) {
   std::cout << "saving distogram: " << file_name<<std::endl;
   cnpy::npy_save(file_name, &mat[0], {n, m}, "w");
 }
@@ -32,7 +38,18 @@ void readTransFile(std::string filename, std::vector<RigidTrans3>& trans, unsign
     boost::split(split_results, line, boost::is_any_of(" :|\t"),
                  boost::token_compress_on);
     //std::cerr << split_results.size() << std::endl;
-    if (split_results.size() < 6) continue;
+    if (split_results.size() < 7) continue;
+
+    int transNumber = 0;
+    try {
+      transNumber = std::stoi(split_results[0]);
+    }
+    catch (...) {
+      continue;
+      //      cout << "Invalid input. Please try again!\n";
+    }
+
+
     // read the last 6 numbers from any file format
     unsigned int trans_index = split_results.size() - 6;
     RigidTrans3 tr(Vector3(std::stof(split_results[trans_index].c_str()),
@@ -51,6 +68,24 @@ void readTransFile(std::string filename, std::vector<RigidTrans3>& trans, unsign
   }
   std::cerr << counter << " transforms were read from file " << filename << std::endl;
   inS.close();
+}
+
+void computeDistMat(const Molecule<Atom> &mol1, std::vector<float> &output_distances, float thr = 16.0)
+{
+  for (unsigned int mol1Index = 0; mol1Index < mol1.size(); mol1Index++)
+    {
+      // create a distance matrix
+      for (unsigned int mol2Index = 0; mol2Index < mol1.size(); mol2Index++)
+        {
+          float d = mol1(mol1Index).dist(mol1(mol2Index));
+          if (d > thr) { // to far
+            output_distances.push_back(0.0);
+          } else {
+            if(d < 0.0001) output_distances.push_back(1.0);
+            else output_distances.push_back(1.0/d); //normalize the dist
+          }
+        }
+    }
 }
 
 int computeDistMatrix(const Molecule<Atom> &mol1, const Molecule<Atom> &mol2,
@@ -110,6 +145,16 @@ int main(int argc, char **argv) {
     }
     std::cout<< "Mol1 CA size: " << mol1.size()<<std::endl;
     std::cout<< "Mol2 CA size: " << mol2.size()<<std::endl;
+
+    // save self distograms
+    std::vector<float> distogram1, distogram2;
+    computeDistMat(mol1, distogram1);
+    computeDistMat(mol2, distogram2);
+    std::string file_name1 = trimExtension(pdb_file_name1) + "_self_distogram.npy";
+    std::string file_name2 = trimExtension(pdb_file_name2) + "_self_distogram.npy";
+    saveMat(mol1.size(), mol1.size(), distogram1, file_name1);
+    saveMat(mol2.size(), mol2.size(), distogram2, file_name2);
+
 
     // read transformations
     std::vector<RigidTrans3> trans;

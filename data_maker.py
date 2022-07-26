@@ -19,26 +19,17 @@ def verify_dir(path):
         os.mkdir(path)
 
 def pdb_to_dssp(exe_dir, pdb_file):
-    dssp_name = "dssp/" + pdb_file.split(".pdb")[0] + ".dssp"
+    dssp_name = pdb_file.split(".pdb")[0] + ".dssp"
     cmd = exe_dir + "/dssp/mkdssps " + pdb_file
     os.system(cmd)
     dssp_out = pdb_file + ".dssp";
     os.rename(dssp_out, dssp_name)
 
-def pdb_to_self_distogram(exe_dir, pdb_file):
-    cmd = exe_dir + "/src/SelfDistogram/self_distogram_maker " + pdb_file
-    os.system(cmd)
-    out_file_name = pdb_file.split(".pdb")[0] + "_self_distogram.npy"
-    new_file_name =  pdb_file.split(".pdb")[0] + "_self_distogram.npy"
-    os.rename(out_file_name, new_file_name)
-
-
 def create_predata(exe_dir, antigen_pdb, antibody_pdb):
     pdb_to_dssp(exe_dir, antigen_pdb)
     pdb_to_dssp(exe_dir, antibody_pdb)
 
-    pdb_to_self_distogram(exe_dir, antigen_pdb)
-    pdb_to_self_distogram(exe_dir, antibody_pdb)
+
 
 def create_input_data(exe_dir, antigen_pdb, antibody_pdb, trans_file, trans_num):
     # generate distograms
@@ -48,14 +39,8 @@ def create_input_data(exe_dir, antigen_pdb, antibody_pdb, trans_file, trans_num)
         + " ../" + antibody_pdb + " ../" + trans_file + " " + str(trans_num)
     print(cmd)
     os.system(cmd)
-#    os.chdir("..")
-
-    # generate patches
-#    verify_dir("patch_data")
-#    os.chdir("patch_data");
 
     patch_cmd= "python3 " + exe_dir + "/get_patches.py " + " distograms.txt"
-    #args.prot_dir+" trans"+args.suffix_Ab+" "+osp.join(args.prot_dir, "PPI")+" "+osp.join(args.prot_dir, "patch_data")
     print(patch_cmd)
     subprocess.check_output(patch_cmd, shell=True)
     os.system(patch_cmd)
