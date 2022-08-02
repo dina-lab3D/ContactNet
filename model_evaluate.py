@@ -35,7 +35,7 @@ def culc_hitrate(table,k):
     return np.sum(top_k[:,0].astype(float))/k
 
 
-def hit_rate(model,prot_ag,prot_ab,config,data_dir="",trans_num=0):
+def hit_rate(model,prot_ag,prot_ab,config,data_dir="",trans_num=0, out_file="evaluation"):
     """
     :param model:  NN model
     :param workdir: dir where trans_file is located
@@ -68,7 +68,7 @@ def hit_rate(model,prot_ag,prot_ab,config,data_dir="",trans_num=0):
     trans=pd.read_csv(osp.join("PPI","trans.txt"),sep="\t",index_col=0,header=None).to_numpy().reshape((-1,1))[:len(score_by_label)]
     score_by_label = np.concatenate([score_by_label, trans],axis=1)
     df=pd.DataFrame(score_by_label,columns=["score","trans"])
-    df.to_csv("evaluation", sep="\t", quoting=csv.QUOTE_NONE,
+    df.to_csv(out_file, sep="\t", quoting=csv.QUOTE_NONE,
                quotechar="", escapechar="\\")
 
 
