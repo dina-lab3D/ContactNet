@@ -4,7 +4,7 @@ import argparse
 import sys
 
 exe_dir = osp.dirname(osp.realpath(sys.argv[0]))
-model_path=osp.join(exe_dir,"weights/mymodel_116")
+model_path=osp.join(exe_dir,"weights/mymodel_108")
 model_path_nano=osp.join(exe_dir,"weights/mymodel_9")
 
 
@@ -16,11 +16,11 @@ config=dict(
     line_len_L=2,
     arch=dict(
         number_of_patches=8,  # 6
-        seq_latent_dim=72,  # 65
-        graph_latent_dim=102,  # 80
+        seq_latent_dim=48,  # 65
+        graph_latent_dim=72,  # 80
         patch_size=20,  # 30
-        number_of_1dtransformer=1,  # 7
-        number_of_2dtransformer=3,  # 5
+        number_of_1dtransformer=4,  # 7
+        number_of_2dtransformer=4,  # 5
         size_l=250,
         size_r=700,
         drop_rate=0,
@@ -32,7 +32,7 @@ config=dict(
         pooling_layers=[False, True, True, True],
         global_pool=True,
         class_predictor=[40,30,20],#50
-        dockQ_predictor=[40,30,5]
+        dockQ_predictor=[40,20,10]
     ),
     hyper=dict(
         dist_alpha=-0.1,
