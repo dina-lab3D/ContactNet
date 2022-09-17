@@ -158,23 +158,23 @@ def single_file_genarator_pre_batched(prot_ag, prot_ab, size_r=1000, size_l=1000
             cur_batch_folder, cur_batch_number = new_batch_folder, new_batch_number
             geo_patches, patches = draw_from_batch(line_number, geo_batch, cords_batch, batch_size=files_in_batch)
 
-            seq1, self_1 = padTo(getOneHotMatrix(prot_ag.split(".pdb")[0] + ".dssp", size_r),
-                                 (size_r, 25)), padTo(np.load(prot_ag.split(".pdb")[0] + "_self_distogram.npy"),
-                                                      (size_r, size_r))
-            seq2, self_2 = padTo(getOneHotMatrix(prot_ab.split(".pdb")[0] + ".dssp", size_l),
+            seq1, self_1 = padTo(getOneHotMatrix(prot_ab.split(".pdb")[0] + ".dssp", size_l),
                                  (size_l, 25)), padTo(np.load(prot_ab.split(".pdb")[0] + "_self_distogram.npy"),
                                                       (size_l, size_l))
+            seq2, self_2 = padTo(getOneHotMatrix(prot_ag.split(".pdb")[0] + ".dssp", size_r),
+                                 (size_r, 25)), padTo(np.load(prot_ag.split(".pdb")[0] + "_self_distogram.npy"),
+                                                      (size_r, size_r))
         except OverflowError:
             print("overflow  at ", name)
             continue
-        except FileNotFoundError:
-            print("file not found: ", file_path)
-            print("at " + data_dir,
-                  " at batch folder - " + str(cur_batch_folder) + " at batch: " + str(cur_batch_number))
-            continue
+        # except FileNotFoundError:
+        #     print("file not found: ", file_path)
+        #     print("at " + data_dir,
+        #           " at batch folder - " + str(cur_batch_folder) + " at batch: " + str(cur_batch_number))
+        #     continue
         tf.debugging.assert_shapes(
-            [(seq1, (size_r, 25)), (seq2, (size_l, 25)), (self_1, (size_r, size_r)),
-             (self_2, (size_l, size_l)), (geo_patches, (8, patch_size, patch_size)),
+            [(seq1, (size_l, 25)), (seq2, (size_r, 25)), (self_1, (size_l, size_l)),
+             (self_2, (size_r, size_r)), (geo_patches, (8, patch_size, patch_size)),
              (patches, (8, 2))])
         yield seq1, self_1, seq2, self_2, geo_patches, patches
 

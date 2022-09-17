@@ -21,14 +21,15 @@ void saveMat(unsigned long n, unsigned long m, std::vector<float>& mat, std::str
   cnpy::npy_save(file_name, &mat[0], {n, m}, "w");
 }
 
-void readTransFile(std::string filename, std::vector<RigidTrans3>& trans, unsigned int transNum = 0) {
+void readTransFile(std::string filename, std::vector<RigidTrans3>& trans,std::vector<int>& trans_index, unsigned int transNum = 0) {
   std::ifstream inS(filename);
   if (!inS) {
     std::cerr << "Problem opening transformation file " << filename << std::endl;
-    return;
+    return ;
   }
   std::string line;
   unsigned int counter = 0;
+  int transNumber = 0;
   while (!inS.eof()) {
     getline(inS, line);
     boost::trim(line);  // remove all spaces
@@ -39,14 +40,14 @@ void readTransFile(std::string filename, std::vector<RigidTrans3>& trans, unsign
                  boost::token_compress_on);
     //std::cerr << split_results.size() << std::endl;
     if (split_results.size() < 7) continue;
-
-    int transNumber = 0;
+    transNumber = 0;
     try {
       transNumber = std::stoi(split_results[0]);
+      trans_index.push_back(transNumber);
     }
     catch (...) {
+      std::cout << "Invalid input. Please try again!\n";
       continue;
-      //      cout << "Invalid input. Please try again!\n";
     }
 
 
@@ -64,27 +65,35 @@ void readTransFile(std::string filename, std::vector<RigidTrans3>& trans, unsign
     } else
       break;
     counter++;
+
     // std::cerr << tr << std::endl;
   }
   std::cerr << counter << " transforms were read from file " << filename << std::endl;
   inS.close();
 }
 
-void computeDistMat(const Molecule<Atom> &mol1, std::vector<float> &output_distances, float thr = 16.0)
+void computeDistMat(const Molecule<Atom> &mol1, std::vector<float> &out, int thr = 16)
 {
-  for (unsigned int mol1Index = 0; mol1Index < mol1.size(); mol1Index++)
-    {
-      // create a distance matrix
-      for (unsigned int mol2Index = 0; mol2Index < mol1.size(); mol2Index++)
+    for (unsigned int mol1Index = 0; mol1Index < mol1.size(); mol1Index++)
+    {// create a distance matrix
+        for (unsigned int mol2Index = 0; mol2Index < mol1.size(); mol2Index++)
         {
-          float d = mol1(mol1Index).dist(mol1(mol2Index));
-          if (d > thr) { // to far
-            output_distances.push_back(0.0);
-          } else {
-            if(d < 0.0001) output_distances.push_back(1.0);
-            else output_distances.push_back(1.0/d); //normalize the dist
-          }
+
+
+
+            float d = mol1(mol1Index).dist(mol1(mol2Index));
+            if (d > 16)
+            {//todo cutoff to far
+                out.push_back(0);
+            }
+            else
+            {
+                if( d<0.0001)out.push_back(1);
+                else out.push_back(1 / (d));//normlize the dist
+//                  out.push_back(d);
+            }
         }
+
     }
 }
 
@@ -97,17 +106,18 @@ int computeDistMatrix(const Molecule<Atom> &mol1, const Molecule<Atom> &mol2,
     for(unsigned int mol2Index = 0; mol2Index < mol2.size() ; mol2Index++) {
       float d = mol1(mol1Index).dist(mol2(mol2Index));
       if (d > thr){
-        output_distances.push_back(0.0);
+        output_distances.push_back(0);
       } else {
         if (!is_contact) { is_contact = true;}
-        if(d < 0.0001) output_distances.push_back(1.0);
-        output_distances.push_back(1.0/d); //normalize the dist
+//        if(d < 0.0001) output_distances.push_back(1.0);
+        output_distances.push_back(1/d); //normalize the dist
       }
     }
   }
   if (!is_contact) { return 1; }
   return 0;
 }
+
 
 int main(int argc, char **argv) {
 
@@ -157,31 +167,34 @@ int main(int argc, char **argv) {
 
 
     // read transformations
-    std::vector<RigidTrans3> trans;
-    if(argc == 3) { // no transformations given, use identity
-      trans.push_back(RigidTrans3());
-    }
-    if(argc >=4) { // read transformations from a file
-      int transNum = 0;
-      if(argc == 5) { transNum = std::stoi(argv[4]); }
-      readTransFile(argv[3], trans, transNum);
-    }
-
-    // calculate matrices
-    std::ofstream filenames("distograms.txt");
-    std::ofstream transfile("trans.txt");
-    for(unsigned int i=0; i<trans.size(); i++) {
-      Molecule<Atom> tmol2 = mol2;
-      tmol2.rigidTrans(trans[i]);
-      std::vector<float> mat;
-      computeDistMatrix(mol1, tmol2, mat);
-      std::string out_file = std::string(fs::path(pdb_file_name1).stem())
-        + "_" + std::string(fs::path(pdb_file_name2).stem()) + "_" + std::to_string(i) + ".npy";
-      std::cout << i+1 << " " << trans[i] << " ";
-      saveMat(mol1.size(), tmol2.size(), mat, out_file);
-      filenames << out_file << std::endl;
-      transfile << i+1 << "\t" << trans[i] << std::endl;
-    }
+//    std::vector<RigidTrans3> trans;
+//    std::vector<int> trans_indices;
+//
+////    if(argc == 3) { // no transformations given, use identity
+////      trans.push_back(RigidTrans3());
+////    }
+////    if(argc >=4) { // read transformations from a file
+////      int transNum = 0;
+//     if(argc < 5) {  std::cout<<"not engouthe  args "<<std::endl; }
+//     int transNum = std::stoi(argv[4]);
+//     readTransFile(argv[3], trans, trans_indices,transNum);
+////    }
+//
+//    // calculate matrices
+//    std::ofstream filenames("distograms.txt");
+//    std::ofstream transfile("trans.txt");
+//    for(unsigned int i=0; i<trans.size(); i++) {
+//      Molecule<Atom> tmol2 = mol2;
+//      tmol2.rigidTrans(trans[i]);
+//      std::vector<float> mat;
+//      computeDistMatrix(tmol2,mol1, mat);
+//      std::string out_file = std::string(fs::path(pdb_file_name2).stem())+".pdbX"+
+//      std::string(fs::path(pdb_file_name1).stem()) + ".pdbtransform_number_" + std::to_string(trans_indices[i]) ;
+//      std::cout << i+1 << " " << trans[i] << " ";
+//      saveMat( tmol2.size(),mol1.size(), mat, out_file);
+//      filenames << out_file << std::endl;
+//      transfile << i+1 << "\t" << trans[i] << std::endl;
+//    }
   }
   return 1;
 }
