@@ -4,15 +4,6 @@ import os
 import argparse
 import subprocess
 
-#script_intro="#!/bin/csh \n#SBATCH --mem=20g \n#SBATCH -c6 \n#SBATCH --time=18:0:0\
-#\n#SBATCH --gres=gpu:1,vmem:14g\
-#\nmodule load cuda/11.3\
-#\nmodule load cudnn/8.2.1\
-#\nmodule load nccl\
-#\nsource  /cs/labs/dina/matanhalfon/mypython2/bin/activate.csh\
-#\ncd /cs/labs/dina/matanhalfon/CAPRI\
-#\npython3 model_evaluate.py NNscripts/lr-0.003_5_train_transformer_ABDBADAMW_Alphfold_transformer_5_4_heads_4_5_70_44_5e4_lr_kernal_1_3_3_wd_5e-3_sample4_slower_decay/mymodel_106 "
-#patch_extractor="python3 ../../get_patches.py "
 
 def verify_dir(path):
     if not osp.isdir(path):
@@ -34,13 +25,14 @@ def create_predata(exe_dir, antigen_pdb, antibody_pdb):
 def create_input_data(exe_dir, antigen_pdb, antibody_pdb, trans_file, trans_num):
     # generate distograms
     verify_dir("PPI")
-    os.chdir("PPI");
+    os.chdir("PPI")
     cmd = exe_dir + "/src/ComplexDistogram/complex_distogram_maker ../" + antigen_pdb\
         + " ../" + antibody_pdb + " ../" + trans_file + " " + str(trans_num)
     print(cmd)
     os.system(cmd)
 
     patch_cmd= "python3 " + exe_dir + "/get_patches.py " + " distograms.txt"
+    print(os.system("pwd"))
     print(patch_cmd)
     subprocess.check_output(patch_cmd, shell=True)
     os.system(patch_cmd)
@@ -55,7 +47,7 @@ def main():
     parser.add_argument('antigen_pdb',type=str,help="Antigen PDB file name")
     parser.add_argument('antibody_pdb',type=str,help="Antibody PDB file name")
     parser.add_argument('trans_file',type=str,default="soap_score.res",help="transformation file name")
-    parser.add_argument('--trans_num',type=int,default=0,help="# of transform to read from a transformation file, default all")
+    parser.add_argument('--trans_num',type=int,default=6000,help="# of transform to read from a transformation file, default all (6000)")
     args=parser.parse_args()
 
     if len(sys.argv) < 4:

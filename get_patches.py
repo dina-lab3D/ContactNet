@@ -1,6 +1,7 @@
 from patch_extractor import find_centers_by_heuristic
 import os.path as osp
 import os
+import tensorflow as tf
 import numpy as np
 import sys
 
@@ -8,22 +9,18 @@ def patch_to_tensors(patches):
     ls=[[p.left_col,+p.top_row ]for p in patches]
     return ls
 
-def padTo(mat, dim, val=0, is_np=False):
-    s = mat.shape
-    padding = [[0, m - s[i]] for (i, m) in enumerate(dim)]
-    # print(padding)
-    # print(mat.shape)
-    if is_np:
-        mat = np.pad(mat, padding, constant_values=val)
-    else:
-        mat = tf.pad(mat, padding, 'CONSTANT', constant_values=val)
-    return mat
+def padTo(mat,dim,val=0):
+        s=mat.shape
+        padding=[[0,m-s[i]] for (i,m) in enumerate(dim)]
+        mat= tf.pad(mat,padding,'CONSTANT',constant_values=val)
+        return mat
+
 
 def extract_patches(im, patches, patch_size=30):
     out =[]
     for p in patches:
         extracted=im[p[0]:p[0]+patch_size,p[1]:p[1]+patch_size]
-        out.append(padTo(extracted,(patch_size,patch_size),is_np=True))
+        out.append(padTo(extracted,(patch_size,patch_size)))
     return np.stack(out)
 
 def check_patches(ls,distogram,patch_size):
@@ -57,16 +54,16 @@ def preprosses_patches_batched(distogram_file,centers=6, patch_size=30,batch_siz
     lines = file.readlines()
     print(len(lines))
 
-    for line in lines:
+    for i,line in enumerate(lines):
+        if i%100==0:
+            print("at line - "+str(i))
         distogram_file = line.strip()
-        print(distogram_file)
-        #distogram = get_distogram(distogram_file, size_r, size_l)
+        # print(distogram_file)
         try:
             distogram = get_distogram(distogram_file, size_r, size_l)
             if not (distogram > 0).any():
                 print("all distogram are zero")
                 continue
-            # raise ZeroDivisionError
         except ValueError :
             with open("errors.txt", 'a') as f:
                 f.write("crashed on line " + line + " at file "+ distogram_file + " \n")
@@ -98,7 +95,7 @@ def preprosses_patches_batched(distogram_file,centers=6, patch_size=30,batch_siz
 if __name__ == '__main__':
     try:
         distogram_filenames_file = sys.argv[1]
-        preprosses_patches_batched(distogram_filenames_file,size_r=750,size_l=250,batch_size=2500,centers=8,patch_size=20)
+        preprosses_patches_batched(distogram_filenames_file,size_r=250,size_l=700,batch_size=2500,centers=8,patch_size=20)
     except Exception as e :
         print(e)
         with open("errors.txt",'a')as f:

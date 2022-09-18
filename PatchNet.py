@@ -93,8 +93,8 @@ class make_blocks(layers.Layer):
 
     def call(self,input ,traning=False):
         seq1M, seq2M, patches, geo=input
-        tf.ensure_shape(seq1M,(None,self.size_r,self.seq_latent_space))
-        tf.ensure_shape(seq2M,(None,self.size_l,self.seq_latent_space))
+        tf.ensure_shape(seq1M,(None,self.size_l,self.seq_latent_space))
+        tf.ensure_shape(seq2M,(None,self.size_r,self.seq_latent_space))
         tf.ensure_shape(geo,(None,self.num_of_patches,self.patch_size,self.patch_size))
         tf.ensure_shape(patches, (None, self.num_of_patches,2))
         batches_of_blocks = []
