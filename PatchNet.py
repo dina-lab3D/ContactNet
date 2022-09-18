@@ -3,8 +3,6 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import tensorflow_addons as tfa
-import wandb
-from wandb.keras import WandbCallback
 from tensorflow.keras import layers, Model, Input
 from tensorflow.keras.layers import Dense, Conv1D, Conv2D, AveragePooling1D, AveragePooling2D, Add, Activation, \
     MaxPool2D, BatchNormalization, Permute, Multiply, Reshape, Dropout, Attention

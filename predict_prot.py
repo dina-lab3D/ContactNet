@@ -4,7 +4,9 @@ import argparse
 import sys
 
 exe_dir = osp.dirname(osp.realpath(sys.argv[0]))
-model_path=osp.join(exe_dir,"weights/mymodel_116")
+model_path=osp.join(exe_dir,"weights/mymodel_108")
+model_path_nano=osp.join(exe_dir,"weights/mymodel_9")
+
 
 
 
@@ -14,11 +16,11 @@ config=dict(
     line_len_L=2,
     arch=dict(
         number_of_patches=8,  # 6
-        seq_latent_dim=72,  # 65
-        graph_latent_dim=102,  # 80
+        seq_latent_dim=48,  # 65
+        graph_latent_dim=72,  # 80
         patch_size=20,  # 30
-        number_of_1dtransformer=1,  # 7
-        number_of_2dtransformer=3,  # 5
+        number_of_1dtransformer=4,  # 7
+        number_of_2dtransformer=4,  # 5
         size_l=250,
         size_r=700,
         drop_rate=0,
@@ -30,7 +32,7 @@ config=dict(
         pooling_layers=[False, True, True, True],
         global_pool=True,
         class_predictor=[40,30,20],#50
-        dockQ_predictor=[40,30,5]
+        dockQ_predictor=[40,20,10]
     ),
     hyper=dict(
         dist_alpha=-0.1,
@@ -52,6 +54,12 @@ if __name__ == '__main__':
     parser.add_argument('antibody_pdb',type=str,help="Antibody PDB file name")
     parser.add_argument("-o", '--output',type=str, default="evaluation",help="Out file")
     parser.add_argument('--trans_num',type=int,default=0,help="# of transform to read from a transformation file, default all")
+    parser.add_argument('--nanobody', type=int, default=0, help="enter 1 if nanobody to use fine-tuned weights else 0")
     args=parser.parse_args()
-    model = load_modle(model_path, config)
+
+    if args.nanobody:
+        model = load_modle(model_path_nano, config)
+    else:
+        model = load_modle(model_path, config)
+
     hit_rate(model, args.antigen_pdb,args.antibody_pdb, config, trans_num=args.trans_num,data_dir="PPI", out_file=args.output)
