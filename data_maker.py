@@ -36,6 +36,11 @@ def create_input_data(exe_dir, antigen_pdb, antibody_pdb, trans_file, trans_num)
     print(patch_cmd)
     subprocess.check_output(patch_cmd, shell=True)
     os.system(patch_cmd)
+
+    for n in range(1, trans_num+1):
+        dfile = antibody_pdb + "X" + antigen_pdb + "transform_number_" + str(n)
+        if os.path.exists(dfile):
+            os.remove(dfile)
     os.chdir("..")
 
 def main():
